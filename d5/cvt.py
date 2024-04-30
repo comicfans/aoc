@@ -12,11 +12,14 @@ def map_to_pos(maps, seed):
             res = res - m[k][0] + m[k][1]
     return res
 
+def map_to_range(map, start, length):
+    pass
+
 def parseMap(lines):
     seeds = None
     maps = []
-    lines.append("fake map:")
 
+    lines.append(" fake map:")
     for l in lines:
         line = l.strip()
         if len(line) == 0:
@@ -35,8 +38,8 @@ def parseMap(lines):
         dst_src_len= [int(num) for num in line.strip().split(' ')]
         maps[len(maps)-1].append([dst_src_len[1], dst_src_len[0], dst_src_len[2]])
 
-    pos = map(lambda x:map_to_pos(maps,x), seeds)
-    return min(pos)
+    maps.pop()
+    return (seeds, maps)
 
 
 def test1():
@@ -74,12 +77,44 @@ def test1():
             ,"60 56 37"
             ,"56 93 4"]
     res1= parseMap(example)
-    print(res1)
+    seeds = res1[0]
+    maps = res1[1]
+    pos = map(lambda x:map_to_pos(maps,x), seeds)
+    res = min(pos)
+    print(res)
+    return res
+
 
 
 def test2():
     with open('input.txt') as f:
         lines = f.readlines()
-        res = parseMap(lines)
+        res1 = parseMap(lines)
+        seeds = res1[0]
+        maps = res1[1]
+        pos = map(lambda x:map_to_pos(maps,x), seeds)
+        res = min(pos)
+        assert(res == 318728750)
         print(res)
-test2()
+
+def test3():
+    with open('input.txt') as f:
+        lines = f.readlines()
+        res1 = parseMap(lines)
+        start_range = res1[0]
+
+        maps = res1[1]
+        pair_number = len(start_range)/2
+
+        start_range_pair= [(start_range[idx*2],start_range[idx * 2 + 1]) for idx in range(int(pair_number))]
+
+        seeds = [list([i + start for i in range(r)]) for (start, r) in start_range_pair]
+
+
+        pos = map(lambda x:map_to_pos(maps,x), seeds)
+        res = min(pos)
+        print(res)
+
+#test2()
+#test2()
+test3()
