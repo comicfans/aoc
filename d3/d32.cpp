@@ -11,10 +11,6 @@
 
 using namespace std;
 
-bool issymbol(char c){
-    return !isdigit(c) && (c!='.');
-}
-
 int main(int argc,char** argv){
 
     auto input = //ifstream(argv[argc-1]);
@@ -28,7 +24,8 @@ int main(int argc,char** argv){
         allLines.push_back(line);
     }
 
-    uint64_t sum = 0;
+
+    map<pair<int,int>, vector<int>> gears;
 
     for(int i = 0; i< allLines.size(); ++i){
 
@@ -39,10 +36,16 @@ int main(int argc,char** argv){
                 continue;
             }
 
+            if(number.empty()){
+                continue;
+            }
+
             int charBegin = j - number.size();
             int charEnd = j;
 
-            bool adjSymbol = false;
+
+            int num = 0;
+            auto res = std::from_chars(number.data(),number.data() + number.size(), num);
             for(int offset:{-1,1}){
 
                 if(i+offset <0 || i+offset == allLines.size()){
@@ -53,38 +56,33 @@ int main(int argc,char** argv){
                     if(check <0 || check == allLines[i].size()){
                         continue;
                     }
-                    if(issymbol(allLines[i+offset][check])){
-                        adjSymbol  = true;
-                        break;
+                    if(allLines[i+offset][check] == '*'){
+                        gears[{i+offset, check}].push_back(num);
                     }
                 }
-                if(adjSymbol){
-                    break;
-                }
+                
             }
 
-            if(!adjSymbol && charBegin >0 && issymbol(allLines[i][charBegin - 1])){
-                adjSymbol = true;
+            if( charBegin >0 && allLines[i][charBegin - 1] == '*'){
+                gears[{i, charBegin - 1}].push_back(num);
             }
 
-            if(!adjSymbol && charEnd < allLines[i].size() && issymbol(allLines[i][charEnd])){
-                adjSymbol = true;
+            if(charEnd != allLines[i].size() && allLines[i][charEnd] == '*'){
+                gears[{i, charEnd}].push_back(num);
             }
 
             
-
-            if(number.empty() || !adjSymbol){
-                number.clear();
-                continue;
-            }
-
-            int num = 0;
-            auto res = std::from_chars(number.data(),number.data() + number.size(), num);
-
-            sum+=num;
             number.clear();
         }
-
     }
+
+    uint64_t sum = 0;
+    for(const auto &[k,v]: gears){
+        if(v.size()!=2){
+            continue;
+        }
+        sum += v[0]*v[1];
+    }
+
     std::cout<<sum<<std::endl;
 }
