@@ -48,4 +48,47 @@ def test1():
 
     print(step)
 
-test1()
+#test1()
+
+def walk_az(dir,path,current):
+    step = 0
+
+    while True:
+
+        if current.endswith('Z'):
+            break
+
+        idx = 0 if dir[step  %  len(dir)] == 'L' else 1
+
+
+        current = path[current][idx]
+        step = step + 1
+        prev_select = idx
+
+    return step
+
+
+example2 = [
+"LR",
+"",
+"11A = (11B, XXX)",
+"11B = (XXX, 11Z)",
+"11Z = (11B, XXX)",
+"22A = (22B, XXX)",
+"22B = (22C, 22C)",
+"22C = (22Z, 22Z)",
+"22Z = (22B, 22B)",
+"XXX = (XXX, XXX)"
+]
+def test2():
+    lines = open('input.txt').readlines()
+    parsed = parse_input(lines)
+
+    dir = parsed[0]
+    path = parsed[1]
+
+    starts= filter(lambda x: x.endswith('A'),path.keys())
+    steps = map(lambda x:walk_az(dir,path,x), starts)
+    res = math.lcm(*steps)
+    print(res)
+
